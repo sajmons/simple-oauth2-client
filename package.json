@@ -1,0 +1,25 @@
+{
+  "name": "simple-oauth2-client",
+  "version": "0.1.0",
+  "description": "Preconfigured simplified OAuth2 client that uses passport and passport-oauth2",
+  "author": {
+    "email": "simon.sander@vizija.si",
+    "name": "Simon Šander"
+  },
+  "license": "ISC",
+  "main": "index.js",
+  "dependencies": {
+    "is-empty": "^1.0.0",
+    "passport": "^0.3.2",
+    "passport-oauth2": "^1.2.0",
+    "password-generator": "^2.0.2",
+    "request": "^2.69.0"
+  },
+  "devDependencies": {},  
+  "optionalDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sajmons/oauth2-client.git"
+  },
+  "readmeFilename": "readme.md"
+}
