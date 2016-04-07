@@ -19,7 +19,7 @@
   "optionalDependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/sajmons/oauth2-client.git"
+    "url": "https://github.com/sajmons/simple-oauth2-client.git"
   },
   "readmeFilename": "readme.md"
 }
