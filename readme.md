@@ -19,4 +19,4 @@ var sslCert = oauthClient.SSLCert;
 
 ## License
 
-SIC © [Nova Vizija d.d.](http://www.nova.vizija.si)
+ISC © [Nova Vizija d.d.](http://www.nova.vizija.si)
