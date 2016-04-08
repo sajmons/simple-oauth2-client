@@ -4,7 +4,7 @@ const passport = require('passport')
     , OAuth2Strategy = require('passport-oauth2').Strategy;
 
 exports.root = function(req, res, next) {
-    if (req.user) {
+    if (req.isAuthenticated()) {
         next();
     } else {
         res.redirect('/login');
@@ -13,6 +13,16 @@ exports.root = function(req, res, next) {
 
 exports.login = function(req, res, next) {
     next();
+};
+
+exports.redirect = function(req, res, next) {
+    req.session.returnTo = req.query.url;
+    
+    if (req.isAuthenticated()) {
+        return res.redirect("/?redirect_url=" + encodeURIComponent(req.query.url));
+    } else {    
+        res.redirect("/login");
+    }
 };
 
 exports.callback = function(req, res, next) {
@@ -39,7 +49,14 @@ exports.callback = function(req, res, next) {
                 var config = app.get('config');
      
                 res.cookie(config.oauth2.cookie, accessToken);
-                return res.redirect('/');
+                
+                var returnTo = req.session.returnTo;  
+                if (returnTo) {
+                    delete req.session.returnTo;
+                    return res.redirect("/?redirect_url=" + encodeURIComponent(returnTo));
+                } else {                
+                    return res.redirect('/');
+                }
             });
         })(req, res, next);
     }
@@ -47,7 +64,7 @@ exports.callback = function(req, res, next) {
 
 exports.logout = function(req, res, next) {
 
-    if (!req.user) return res.sendStatus(401);
+    if (!req.isAuthenticated()) return res.sendStatus(401);
 
     req.app.models.AccessToken.findOne({
         where: { userId: req.user.id }
