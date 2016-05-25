@@ -81,8 +81,13 @@ exports.logout = function(req, res, next) {
 
             res.clearCookie(config.oauth2.cookie);
 
+            if (!config['url']) {
+                res.status(400).send("Missing url setting in config.json");
+                return;
+            }
+
             var logoutUrl = config.oauth2.authorizationHost
-                + '/logout?redirect_url=' + config['https-url']
+                + '/logout?redirect_url=' + config['url']
                 + '/login&access_token=' + token.id;
 
             res.redirect(logoutUrl);
