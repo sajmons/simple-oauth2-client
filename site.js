@@ -46,10 +46,6 @@ exports.callback = function(req, res, next) {
                     return next(err);
                 }
      
-                var config = app.get('config');
-     
-                res.cookie(config.oauth2.cookie, accessToken);
-                
                 var returnTo = req.session.returnTo;  
                 if (returnTo) {
                     delete req.session.returnTo;
