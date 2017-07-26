@@ -7,4 +7,5 @@ module.exports = function (app) {
     app.get('/redirect', site.redirect);
     app.get('/logout', site.logout);
     app.get('/auth/novavizija/callback', site.callback);    
+    app.get('/refreshToken', site.refreshToken);
 };

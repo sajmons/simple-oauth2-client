@@ -1,56 +1,40 @@
 var passport = require('passport');
 var OAuth2Strategy = require('passport-oauth2').Strategy;
 var request = require('request');
-var generatePassword = require('password-generator');
 
-module.exports = function(app, config) {    
+module.exports = function (app, config) {
 
     app.use(passport.initialize());
     app.use(passport.session());
 
     passport.use(new OAuth2Strategy(config.oauth2,
-        function(accessToken, refreshToken, profile, done) {
-            var password = generatePassword(16, false);
-            var ttl = 1209600;
-
+        function (accessTokenId, refreshTokenId, profile, done) {
             if (!profile.id || !profile.emails[0] || !profile.emails[0].value) {
-                return done("Wrong format of user profile");
+                return done(new Error("Wrong format of user profile"));
             }
 
-            var newUser = {
-                id: profile.id,
-                email: profile.emails[0].value,
-                ttl: ttl,
-                password: password,
-                emailVerificationRequired: false,
-                displayName: profile.displayName
-            }
+            let UserModel = app.models.User;
 
-            app.models.User.findOrCreate({
-                where: {
-                    id: profile.id
-                }
-            }, newUser, function(err, user) {
+            UserModel.relations.accessTokens.modelTo.findById(accessTokenId, function (err, accessToken) {
+                if (err) return done(err);
+                if (!accessToken) return done(new Error('could not find accessToken'));
 
-                // Za in-memory uporabnika skreiramo še AccessToken na podlagi OAuth2 token-a, ki smo ga prejeli iz Auth strežnika  
-                app.models.AccessToken.create({
-                    id: accessToken,
-                    ttl: ttl,
-                    created: new Date().toISOString(),
-                    userId: user.id
-                }, function(err) {
+                // Look up the user associated with the accessToken
+                UserModel.findById(accessToken.userId, function (err, user) {
                     if (err) return done(err);
+                    if (!user) return done(new Error('could not find a valid user'));
 
-                    // Iz objekta odstranimo geslo, da ga ne pošiljamo na Login stran 
-                    delete user.password;
-
-                    return done(null, user, { accessToken: accessToken });
+                    return done(null, user, {
+                        accessToken: accessTokenId,
+                        refreshToken: refreshTokenId
+                    });
                 });
+
             });
         }
     ));
 
-    passport.serializeUser(function(user, done) {
+    passport.serializeUser(function (user, done) {
         done(null, user.id);
     });
 
@@ -70,7 +54,7 @@ module.exports = function(app, config) {
             }
         };
 
-        request.get(options, function(err, response, body) {
+        request.get(options, function (err, response, body) {
             if (err) return done(err);
 
             if (response.statusCode === 200) {
@@ -78,7 +62,7 @@ module.exports = function(app, config) {
                     var profile = JSON.parse(body);
                     done(null, profile);
                 } else {
-                    done('Expected profile in JSON format');
+                    done(new Error('Expected profile in JSON format'));
                 }
 
             } else {
