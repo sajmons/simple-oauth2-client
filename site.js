@@ -8,7 +8,7 @@ exports.root = function (req, res, next) {
     if (req.isAuthenticated()) {
         next();
     } else {
-        res.redirect('/login');
+        res.redirect("/login");
     }
 };
 
@@ -17,9 +17,8 @@ exports.login = function (req, res, next) {
 };
 
 exports.redirect = function (req, res, next) {
-    req.session.returnTo = req.query.redirect_url;
-
     if (req.isAuthenticated()) {
+        req.session.returnTo = req.query.redirect_url;
         return res.redirect("/?redirect_url=" + encodeURIComponent(req.query.url));
     } else {
         res.redirect("/login");
@@ -110,7 +109,7 @@ exports.refreshToken = function (req, res, next) {
             },
             form: {
                 grant_type: 'refresh_token',
-                refresh_token: req.cookies[config.oauth2.cookieRefreshToken]
+                refresh_token: req.cookies.get(config.oauth2.cookieRefreshToken)
             }
         };
 

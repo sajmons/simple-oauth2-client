@@ -13,23 +13,9 @@ module.exports = function (app, config) {
                 return done(new Error("Wrong format of user profile"));
             }
 
-            let UserModel = app.models.User;
-
-            UserModel.relations.accessTokens.modelTo.findById(accessTokenId, function (err, accessToken) {
-                if (err) return done(err);
-                if (!accessToken) return done(new Error('could not find accessToken'));
-
-                // Look up the user associated with the accessToken
-                UserModel.findById(accessToken.userId, function (err, user) {
-                    if (err) return done(err);
-                    if (!user) return done(new Error('could not find a valid user'));
-
-                    return done(null, user, {
-                        accessToken: accessTokenId,
-                        refreshToken: refreshTokenId
-                    });
-                });
-
+            return done(null, profile, {
+                accessToken: accessTokenId,
+                refreshToken: refreshTokenId
             });
         }
     ));
