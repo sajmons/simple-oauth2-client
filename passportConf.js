@@ -7,7 +7,15 @@ module.exports = function (app, config) {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    passport.use(new OAuth2Strategy(config.oauth2,
+    const cfg = {
+        authorizationURL: config.oauth2.authorizationURL,
+        tokenURL: config.oauth2.tokenURL,
+        clientID: config.oauth2.clientID,
+        clientSecret: config.oauth2.clientSecret,
+        callbackURL: config.oauth2.callbackURL
+    }
+    
+    passport.use(new OAuth2Strategy(cfg,
         function (accessTokenId, refreshTokenId, profile, done) {
             if (!profile.id || !profile.emails[0] || !profile.emails[0].value) {
                 return done(new Error("Wrong format of user profile"));

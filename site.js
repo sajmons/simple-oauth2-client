@@ -47,8 +47,8 @@ exports.callback = function (req, res, next) {
                 var config = app.get('config');
 
                 res.cookie(config.oauth2.cookie, info.accessToken);
-                res.cookie(config.oauth2.cookieRefreshToken, info.refreshToken);
-                
+                req.session.refresh_token = info.refreshToken;
+
                 var returnTo = req.session.returnTo;
                 if (returnTo) {
                     delete req.session.returnTo;
@@ -109,7 +109,7 @@ exports.refreshToken = function (req, res, next) {
             },
             form: {
                 grant_type: 'refresh_token',
-                refresh_token: req.cookies.get(config.oauth2.cookieRefreshToken)
+                refresh_token: req.session.refresh_token
             }
         };
 
@@ -118,12 +118,12 @@ exports.refreshToken = function (req, res, next) {
                 next(body);
             } else {
                 res.clearCookie(config.oauth2.cookie);
-                res.clearCookie(config.oauth2.cookieRefreshToken);
 
                 var token = JSON.parse(body);
 
                 res.cookie(config.oauth2.cookie, token.accessToken);
-                res.cookie(config.oauth2.cookieRefreshToken, token.refreshToken);
+                req.session.refresh_token = token.refreshToken;
+
                 var redirect_url = req.session.redirect_url;
                 delete req.session.redirect_url;
                 res.redirect(redirect_url);
