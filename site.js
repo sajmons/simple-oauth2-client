@@ -65,33 +65,23 @@ exports.logout = function (req, res, next) {
 
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
-    req.app.models.AccessToken.findOne({
-        where: { userId: req.user.id }
-    }, function (err, token) {
-        if (err) return res.sendStatus(401);
+    req.logout();
 
-        req.logout();
+    var config = app.get('config');
 
-        // Odjavimo uporabnika glede na njegov access_token
-        req.app.models.User.logout(token.id, function (error) {
-            if (error) return next(error);
+    res.clearCookie(config.oauth2.cookie);
 
-            var config = app.get('config');
+    if (!config['url']) {
+        res.status(400).send("Missing url setting in config.json");
+        return;
+    }
 
-            res.clearCookie(config.oauth2.cookie);
+    var logoutUrl = config.oauth2.authorizationHost
+        + '/logout?redirect_url=' + config['url']
+        + '/login&access_token=' + req.query.access_token;
 
-            if (!config['url']) {
-                res.status(400).send("Missing url setting in config.json");
-                return;
-            }
+    res.redirect(logoutUrl);
 
-            var logoutUrl = config.oauth2.authorizationHost
-                + '/logout?redirect_url=' + config['url']
-                + '/login&access_token=' + token.id;
-
-            res.redirect(logoutUrl);
-        });
-    });
 };
 
 exports.refreshToken = function (req, res, next) {
@@ -121,8 +111,8 @@ exports.refreshToken = function (req, res, next) {
 
                 var token = JSON.parse(body);
 
-                res.cookie(config.oauth2.cookie, token.accessToken);
-                req.session.refresh_token = token.refreshToken;
+                res.cookie(config.oauth2.cookie, token.access_token);
+                req.session.refresh_token = token.refresh_token;
 
                 var redirect_url = req.session.redirect_url;
                 delete req.session.redirect_url;
