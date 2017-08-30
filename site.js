@@ -2,7 +2,8 @@
 
 const passport = require('passport')
     , OAuth2Strategy = require('passport-oauth2').Strategy
-    , request = require('request');
+    , request = require('request')
+    , debug = require('debug')('simple-oauth2-client') 
 
 exports.root = function (req, res, next) {
     if (req.isAuthenticated()) {
@@ -79,6 +80,8 @@ exports.logout = function (req, res, next) {
     var logoutUrl = config.oauth2.authorizationHost
         + '/logout?redirect_url=' + config['url']
         + '/login&access_token=' + req.query.access_token;
+
+    debug("LogoutURL: %s", logoutUrl);
 
     res.redirect(logoutUrl);
 
