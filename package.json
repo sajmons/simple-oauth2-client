@@ -1,6 +1,6 @@
 {
   "name": "simple-oauth2-client",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Preconfigured simplified OAuth2 client that uses passport and passport-oauth2",
   "author": {
     "email": "simon.sander@vizija.si",

@@ -12,7 +12,8 @@ module.exports = function (app, config) {
         tokenURL: config.oauth2.tokenURL,
         clientID: config.oauth2.clientID,
         clientSecret: config.oauth2.clientSecret,
-        callbackURL: config.oauth2.callbackURL
+        callbackURL: config.oauth2.callbackURL,
+        scope: config.oauth2.scope
     }
     
     passport.use(new OAuth2Strategy(cfg,
